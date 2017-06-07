@@ -24,6 +24,8 @@ for f in secrets['files'].keys():
     with open(f, 'w') as secretFile:
         secretFile.write(plaintext)
 
+    print('Wrote Secret File: ' + f)
+
 cmd_apache = 'httpd-foreground'
 p = Popen(cmd_apache.split())
 p.communicate()
