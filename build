@@ -39,7 +39,7 @@ if environmentDatabases:
 
 container = argv[1]
 
-for output in appStack.output:
+for output in appStack.outputs:
     if output['OutputKey'] == applicationName + container + 'Repository':
         repository = output['OutputValue']
         break
