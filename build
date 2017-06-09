@@ -44,8 +44,8 @@ for output in appStack.outputs:
         repository = output['OutputValue']
         break
 
-tag = '{repository}:{tag}'.format(repository=repository, tag=env['EnvironmentName'])
-build = '{tag}-{version}'.format(tag=tag, version=environ['CODEBUILD_RESOLVED_SOURCE_VERSION'])
+tag = '{repository}:{tag}'.format(repository=repository, tag=env['EnvironmentName']).lower()
+build = '{tag}-{version}'.format(tag=tag, version=environ['CODEBUILD_RESOLVED_SOURCE_VERSION']).lower()
 
 cmd = 'docker build -t {tag} {src}/containers/{container}'.format(tag=tag, src=environ['CODEBUILD_SRC_DIR'], container=container)
 p = Popen(cmd.split())
@@ -59,7 +59,7 @@ cmd = 'docker push {tag}'.format(tag=tag)
 p = Popen(cmd.split())
 p.communicate()
 
-cmd = 'docker push {build}'.fomrat(build=build)
+cmd = 'docker push {build}'.format(build=build)
 p = Popen(cmd.split())
 p.communicate()
 
