@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+
+import json
+import yaml
+from boto3.session import Session
+from datetime import datetime
+from os import environ
+from subprocess import Popen
+from sys import argv
+
+######################
+# Load Configuration #
+######################
+
+with open('{src}/app.yml'.format(src=environ['CODEBUILD_SRC_DIR']), 'r') as appYAML:
+    app = yaml.load(appYAML)
+
+applicationName = app['ApplicationName']
+applicationContainers = app['Containers']
+
+appStack = cfn.Stack(applicationName)
+
+with open('{src}/env.yml'.format(src=environ['CODEBUILD_SRC_DIR']), 'r') as envYAML:
+    env = yaml.load(envYAML)
+
+environmentName = env['EnvironmentName']
+environmentDatabases = env['Databases']
+
+envStack = cfn.Stack(environmentName)
+if environmentDatabases:
+    envDBStack = cfn.Stack(environmentName + 'Databases')
+
+###################
+# Build Container #
+###################
+
+container = argv[1]
+
+for output in appStack.output:
+    if output['OutputKey'] == applicationName + container + 'Repository':
+        repository = output['OutputValue']
+        break
+
+tag = '{repository}:{tag}'.format(repository=repository, tag=env['EnvironmentName'])
+build = '{tag}-{version}'.format(tag=tag, version=environ['CODEBUILD_RESOLVED_SOURCE_VERSION'])
+
+cmd = 'docker build -t {tag} {src}/containers/{container}'.format(tag=tag, src=environ['CODEBUILD_SRC_DIR'], container=container)
+p = Popen(cmd.split())
+p.communicate()
+
+cmd = 'docker tag {tag} {build}'.format(tag=tag, build=build)
+p = Popen(cmd.split())
+p.communicate()
+
+cmd = 'docker push {tag}'.format(tag=tag)
+p = Popen(cmd.split())
+p.communicate()
+
+cmd = 'docker push {build}'.fomrat(build=build)
+p = Popen(cmd.split())
+p.communicate()
+
