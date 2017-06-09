@@ -8,6 +8,9 @@ from os import environ
 from subprocess import Popen
 from sys import argv
 
+aws = Session(region_name=environ['AWS_DEFAULT_REGION'])
+cfn = aws.resource('cloudformation')
+
 ######################
 # Load Configuration #
 ######################
