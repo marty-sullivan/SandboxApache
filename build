@@ -40,11 +40,12 @@ if environmentDatabases:
 container = argv[1]
 
 for output in appStack.outputs:
-    if output['OutputKey'] == applicationName + container + 'Repository':
+    if output['OutputKey'] == applicationName + 'Repository':
         repository = output['OutputValue']
         break
 
-tag = '{repository}:{tag}'.format(repository=repository, tag=env['EnvironmentName']).lower()
+label = '{container}-{env}'.format(container=container, env=env['EnvironmentName']).lower()
+tag = '{repository}:{label}'.format(repository=repository, label=label).lower()
 build = '{tag}-{version}'.format(tag=tag, version=environ['CODEBUILD_RESOLVED_SOURCE_VERSION']).lower()
 
 cmd = 'docker build -t {tag} {src}/containers/{container}'.format(tag=tag, src=environ['CODEBUILD_SRC_DIR'], container=container)
